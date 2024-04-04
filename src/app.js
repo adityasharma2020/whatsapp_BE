@@ -1,3 +1,14 @@
+/* 
+	* adding morgan middleware for our http request logger 
+	* helmet middleware helps us in secure our exprss apps by adding various http headers.
+	* add express json and urlencoded middleware to parse json request form body and url
+	* adding express-mongo-sanatize middleware to sanitizes user supplied data to prevent mongodb operator injections.
+	* adding cookie parser middleware to parse cookie header and populate req.cookies with an object keyed by the cokkie names.
+	* adding compression middleware to compress response bodies for all request that traverse through the middlewares.
+	* adding express file upload middleware to make uploaded files accessible from req.files.
+	* adding CORS to protect our backend , so that we only wants some origins to access it.(basically restrict access to the server).
+
+*/
 import express from 'express';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
@@ -11,6 +22,21 @@ import createHttpError from 'http-errors';
 import routes from './routes/index.js';
 // dotenv configuration
 dotenv.config();
+
+// CORS Allowed origin
+const allowedOrigins = ['http://localhost:3000', 'https://example.com'];
+const corsOptions = {
+	origin: function (origin, callback) {
+		// Check if the origin is in the list of allowed origins
+		// When a request is made from a page to the same origin (the same scheme, hostname, and port), browsers typically do not include an Origin header.
+		// This behavior is part of the browser's same-origin policy to allow same origin requests and Non-CORS Requests.
+		if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+			callback(null, true); // Allow the request
+		} else {
+			callback(new Error('Not allowed by CORS')); // Block the request
+		}
+	},
+};
 
 //------create express app-----------------
 const app = express();
@@ -31,7 +57,7 @@ app.use(express.json());
 //express mongo sanitize user data
 app.use(mongoSanitize());
 
-// cookie parser
+//cookie parser
 app.use(cookieParser());
 
 //gzip compression
@@ -41,12 +67,12 @@ app.use(compression());
 app.use(
 	fileUpload({
 		useTempFiles: true,
-		tempFileDir: '/tmp/',
+		tempFileDir: '/tmp/', // when we upload a file it create a temp folder
 	})
 );
 
 //cors
-app.use(cors());
+app.use(cors(corsOptions));
 
 //---------------------routes----------------------
 //api v1 routes
