@@ -1,14 +1,14 @@
-/* 
-	* adding morgan middleware for our http request logger 
-	* helmet middleware helps us in secure our exprss apps by adding various http headers.
-	* add express json and urlencoded middleware to parse json request form body and url
-	* adding express-mongo-sanatize middleware to sanitizes user supplied data to prevent mongodb operator injections.
-	* adding cookie parser middleware to parse cookie header and populate req.cookies with an object keyed by the cokkie names.
-	* adding compression middleware to compress response bodies for all request that traverse through the middlewares.
-	* adding express file upload middleware to make uploaded files accessible from req.files.
-	* adding CORS to protect our backend , so that we only wants some origins to access it.(basically restrict access to the server).
-
-*/
+/*
+ * adding morgan middleware for our http request logger
+ * helmet middleware helps us in secure our exprss apps by adding various http headers.
+ * add express json and urlencoded middleware to parse json request form body and url
+ * adding express-mongo-sanatize middleware to sanitizes user supplied data to prevent mongodb operator injections.
+ * adding cookie parser middleware to parse cookie header and populate req.cookies with an object keyed by the cokkie names.
+ * adding compression middleware to compress response bodies for all request that traverse through the middlewares.
+ * adding express file upload middleware to make uploaded files accessible from req.files.
+ * adding CORS to protect our backend , so that we only wants some origins to access it.(basically restrict access to the server).
+ * http errors middleware to handle http errors
+ */
 import express from 'express';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
@@ -82,25 +82,27 @@ app.get('/test', (req, res) => {
 	throw createHttpError.BadRequest('this test route has an error');
 });
 
-app.use('/', (req, res) => {
+app.get('/', (req, res) => {
 	res.send(`<div>this is  main page</div>`);
 });
 
-// -----------------Error handling-------------------------------
+// Default Route Handler : acts as a catch-all for unmatched routes.
 app.use(async (req, res, next) => {
 	next(createHttpError.NotFound('this route does not exist.'));
 });
 
-//Error handling
+// -----------------Error handling-------------------------------
+
+// this is our error-handling middleware : It's a centralized place to handle application errors
+// here using async is not necessary, but using async might be helpful in future if we wnat to logging to DB.
 app.use(async (err, req, res, next) => {
 	res.status(err.status || 500);
 	res.send({
 		error: {
 			status: err.status || 500,
-			message: err.message,
+			message: `message::${err.message}`,
 		},
 	});
-	next();
 });
 
 export default app;
