@@ -1,60 +1,70 @@
-import mongoose from 'mongoose'
-import validator from 'validator'
-import bcrypt from 'bcrypt'
+/* 
+ * collection: 'users' : it specifies that documents based on this schema will be stored
+   in a collection named 'users'. If we dont provde mongoose by default  will pluralize the naem of schema 
+   for naming.
+ * timestamps: true   : adds two fields to each document: createdAt and updatedAt.
+
+ * mongoose.models.UserModel || mongoose.model('userModel', userSchema) : The purpose of using this line of code is to ensure 
+   that only one instance of the UserModel is created.
+    This is important because if you re-import or re-define the model elsewhere in your code, you could end up with 
+    multiple conflicting instances of the same model, leading to potential issues like schema overwrites or multiple connections to the database.
+
+  * salt : As we also want to convert the password to normal state and compare . so , we should make an balance 
+    such that salt is good enough to make password secure as well.
+
+    
+*/
+
+import mongoose from 'mongoose';
+import validator from 'validator';
+import bcrypt from 'bcrypt';
 
 const userSchema = mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: [true, 'please provide your name'],
-    },
-    email: {
-      type: String,
-      required: [true, 'please provide your email address'],
-      unique: [true, 'This email address already exists'],
-      lowerCase: true,
-      validate: [validator.isEmail, 'please provide a valid email address'],
-    },
+	{
+		name: {
+			type: String,
+			required: [true, 'please provide your name'],
+		},
+		email: {
+			type: String,
+			required: [true, 'please provide your email address'],
+			unique: [true, 'This email address already exists'],
+			lowerCase: true,
+			validate: [validator.isEmail, 'please provide a valid email address'],
+		},
 
-    picture: {
-      type: String,
-      default:
-        'https://pixlok.com/wp-content/uploads/2021/03/default-user-profile-picture.jpg',
-    },
-    status: {
-      type: String,
-      default: 'Hey there ! I am using Whatsapp',
-    },
-    password: {
-      type: String,
-      required: [true, 'Please provide your Password'],
-      minLength: [
-        6,
-        'please make sure your password is atleast 6 characters long',
-      ],
-      maxLength: [
-        128,
-        'please make sure your password is less than 128 characters long',
-      ],
-    },
-  },
-  { collection: 'users', timestamps: true }
-)
+		picture: {
+			type: String,
+			default:
+				'https://pixlok.com/wp-content/uploads/2021/03/default-user-profile-picture.jpg',
+		},
+		status: {
+			type: String,
+			default: 'Hey there ! I am using Whatsapp',
+		},
+		password: {
+			type: String,
+			required: [true, 'Please provide your Password'],
+			minLength: [6, 'please make sure your password is atleast 6 characters long'],
+			maxLength: [128, 'please make sure your password is less than 128 characters long'],
+		},
+	},
+	{ collection: 'users', timestamps: true }
+);
 
-// do it only when new user is adding
+// do it only when new user is adding or the password field is updating,not when we are modifing other fields
 userSchema.pre('save', async function (next) {
-  try {
-    if (this.isNew) {
-      const salt = await bcrypt.genSalt(12)
-      const hashedPassword = await bcrypt.hash(this.password, salt)
-      this.password = hashedPassword
-    }
-  } catch (error) {
-    next(error)
-  }
-})
+	try {
+		if (this.isNew || this.isModified('password')) {
+			const salt = await bcrypt.genSalt(12);
+			const hashedPassword = await bcrypt.hash(this.password, salt);
+			this.password = hashedPassword;
+		}
+	} catch (error) {
+		next(error);
+	}
+});
 
-const UserModel =
-  mongoose.models.UserModel || mongoose.model('userModel', userSchema)
+const UserModel = mongoose.models.UserModel || mongoose.model('userModel', userSchema);
 
-export default UserModel
+export default UserModel;
