@@ -1,3 +1,8 @@
+/* 
+  before passing our request to controller , we check whether the request have 
+  valid token or not.
+*/
+
 import createHttpError from 'http-errors'
 import jwt from 'jsonwebtoken'
 
