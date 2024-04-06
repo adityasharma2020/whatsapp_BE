@@ -83,7 +83,7 @@ export const login = async (req, res, next) => {
 			path: '/api/v1/auth/refreshtoken',
 			maxAge: 30 * 24 * 60 * 60 * 1000, //30 days
 		});
-		
+
 		res.json({
 			message: 'login success.',
 			user: {
@@ -104,7 +104,7 @@ export const logout = async (req, res, next) => {
 	try {
 		res.clearCookie('refreshtoken', { path: '/api/v1/auth/refreshtoken' });
 		res.json({
-			message: 'logged out',
+			message: 'logged out successfully.',
 		});
 	} catch (error) {
 		next(error);
@@ -114,6 +114,7 @@ export const logout = async (req, res, next) => {
 export const refreshToken = async (req, res, next) => {
 	try {
 		const refresh_token = req.cookies.refreshToken;
+
 		if (!refresh_token) throw createHttpError.Unauthorized('please login');
 		const check = await verifyToken(refresh_token, process.env.REFRESH_TOKEN_SECRET);
 
@@ -125,7 +126,7 @@ export const refreshToken = async (req, res, next) => {
 			process.env.ACCESS_TOKEN_SECRET
 		);
 		res.json({
-			message: 'register success.',
+			message: 'token refreshed successfully.',
 			user: {
 				_id: user._id,
 				name: user.name,
