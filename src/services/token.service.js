@@ -20,6 +20,5 @@ export const generateToken = async (payload, expiresIn, secret) => {
 
 export const verifyToken = async (token, secret) => {
 	let check = await verify(token, secret);
-  console.log("check :",check);
 	return check;
 };

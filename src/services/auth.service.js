@@ -47,7 +47,7 @@ export const createUser = async (userData) => {
 		);
 	}
 
-	//hashing of password ----> to be done in the user model using pre-save middleware of mongoose 
+	//hashing of password ----> to be done in the user model using pre-save middleware of mongoose
 
 	// -------------------adding user to the database--------------------
 	const user = await new UserModel({
