@@ -20,6 +20,7 @@ export const create_open_conversation = async (req, res, next) => {
 		//check if chat exists
 		const existed_conversation = await doesConversationExist(sender_id, receiver_id);
 		if (existed_conversation) {
+			
 			res.json(existed_conversation);
 		} else {
 			let receiver_user = await findUser(receiver_id);
