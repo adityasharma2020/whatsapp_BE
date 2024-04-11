@@ -3,13 +3,14 @@ import { MessageModel } from '../models/index.js';
 
 export const createMessage = async (data) => {
 	let newMessage = await MessageModel.create(data);
-
+	console.log(newMessage);
 	if (!newMessage) throw createHttpError.BadRequest('Oops...something went wrong.');
 
 	return newMessage;
 };
 
 export const populateMessage = async (id) => {
+	console.log('id::::::::::::::', id);
 	let msg = await MessageModel.findById(id)
 		.populate({
 			path: 'sender',
@@ -28,6 +29,7 @@ export const populateMessage = async (id) => {
 		});
 
 	if (!msg) throw createHttpError.BadRequest('Oops...something went wrong.');
+	console.log('msgggggggggggg::::::::::;;', msg);
 	return msg;
 };
 
@@ -41,6 +43,6 @@ export const getConvoMessages = async (convo_id) => {
 	if (!messages) {
 		throw createHttpError.BadRequest('Oops...something went wrong.');
 	}
-
+	console.log('messages>>::::', messages);
 	return messages;
 };
