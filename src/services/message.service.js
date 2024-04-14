@@ -10,7 +10,7 @@ export const createMessage = async (data) => {
 };
 
 export const populateMessage = async (id) => {
-	console.log('id::::::::::::::', id);
+	
 	let msg = await MessageModel.findById(id)
 		.populate({
 			path: 'sender',
@@ -19,7 +19,7 @@ export const populateMessage = async (id) => {
 		})
 		.populate({
 			path: 'conversation',
-			select: 'name isGroup',
+			select: 'name picture isGroup users',
 			model: 'ConversationModel',
 			populate: {
 				path: 'users',
@@ -29,7 +29,7 @@ export const populateMessage = async (id) => {
 		});
 
 	if (!msg) throw createHttpError.BadRequest('Oops...something went wrong.');
-	console.log('msgggggggggggg::::::::::;;', msg);
+	
 	return msg;
 };
 
@@ -43,6 +43,6 @@ export const getConvoMessages = async (convo_id) => {
 	if (!messages) {
 		throw createHttpError.BadRequest('Oops...something went wrong.');
 	}
-	console.log('messages>>::::', messages);
+	
 	return messages;
 };
