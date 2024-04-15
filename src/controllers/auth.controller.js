@@ -17,6 +17,10 @@ import createHttpError from 'http-errors';
 import { createUser, signUser } from '../services/auth.service.js';
 import { generateToken, verifyToken } from '../services/token.service.js';
 import { findUser } from '../services/user.service.js';
+import { getFutureTimestamp } from '../utils/token.util.js';
+
+const accessTokenExpiration = '1d';
+const refreshTokenExpiration = '30d';
 
 export const register = async (req, res, next) => {
 	try {
@@ -25,25 +29,29 @@ export const register = async (req, res, next) => {
 
 		const access_token = await generateToken(
 			{ userId: newUser._id },
-			'1d',
+			accessTokenExpiration,
 			process.env.ACCESS_TOKEN_SECRET
 		);
 		const refresh_token = await generateToken(
 			{ userId: newUser._id },
-			'30d',
+			refreshTokenExpiration,
 			process.env.REFRESH_TOKEN_SECRET
 		);
 
 		//---------send refresh token in cookies------------------------
 		res.cookie('refreshToken', refresh_token, {
-			httpOnly: true,
-			path: '/api/v1/auth/refreshtoken',
+			httpOnly: false,
+			domain: 'localhost',
+			secure: false,
+			path: '/',
 			maxAge: 30 * 24 * 60 * 60 * 1000, //30 days
 		});
 
 		console.table({ access_token, refresh_token });
 
 		//--------------send response-----------------------------
+		const access_token_expires = getFutureTimestamp('1d');
+
 		res.json({
 			message: 'register success.',
 			user: {
@@ -53,6 +61,7 @@ export const register = async (req, res, next) => {
 				picture: newUser.picture,
 				status: newUser.status,
 				token: access_token,
+				tokenExpires: access_token_expires,
 			},
 		});
 	} catch (error) {
@@ -68,21 +77,25 @@ export const login = async (req, res, next) => {
 
 		const access_token = await generateToken(
 			{ userId: user._id },
-			'1d',
+			accessTokenExpiration,
 			process.env.ACCESS_TOKEN_SECRET
 		);
 		const refresh_token = await generateToken(
 			{ userId: user._id },
-			'30d',
+			refreshTokenExpiration,
 			process.env.REFRESH_TOKEN_SECRET
 		);
 
 		//send refresh token in cookies
 		res.cookie('refreshToken', refresh_token, {
-			httpOnly: true,
-			path: '/api/v1/auth/refreshtoken',
+			httpOnly: false,
+			domain: 'localhost',
+			secure: false,
+			path: '/',
 			maxAge: 30 * 24 * 60 * 60 * 1000, //30 days
 		});
+
+		const access_token_expires = getFutureTimestamp('1d');
 
 		res.json({
 			message: 'login success.',
@@ -93,6 +106,7 @@ export const login = async (req, res, next) => {
 				picture: user.picture,
 				status: user.status,
 				token: access_token,
+				tokenExpires: access_token_expires,
 			},
 		});
 	} catch (error) {
@@ -125,6 +139,8 @@ export const refreshToken = async (req, res, next) => {
 			'1d',
 			process.env.ACCESS_TOKEN_SECRET
 		);
+
+		const access_token_expires = getFutureTimestamp('1d');
 		res.json({
 			message: 'token refreshed successfully.',
 			user: {
@@ -134,6 +150,7 @@ export const refreshToken = async (req, res, next) => {
 				picture: user.picture,
 				status: user.status,
 				token: access_token,
+				tokenExpires: access_token_expires,
 			},
 		});
 	} catch (error) {

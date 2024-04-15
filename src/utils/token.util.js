@@ -44,3 +44,17 @@ export const verify = async (token, secret) => {
 		});
 	});
 };
+
+// This function converts a period like '1d' or '30d' to milliseconds and returns the future timestamp
+export const getFutureTimestamp = (duration) => {
+	const units = {
+		s: 1000, // seconds
+		m: 60 * 1000, // minutes
+		h: 60 * 60 * 1000, // hours
+		d: 24 * 60 * 60 * 1000, // days
+	};
+	const unit = duration.slice(-1);
+	const amount = parseInt(duration.slice(0, -1));
+	const durationInMilliseconds = amount * (units[unit] || 0);
+	return Date.now() + durationInMilliseconds;
+};
