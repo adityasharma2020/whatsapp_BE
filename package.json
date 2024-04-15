@@ -26,6 +26,7 @@
     "mongoose": "^7.4.2",
     "morgan": "^1.10.0",
     "nodemon": "^3.0.1",
+    "socket.io": "^4.7.5",
     "trim-request": "^1.0.6",
     "validator": "^13.11.0",
     "winston": "^3.10.0"
