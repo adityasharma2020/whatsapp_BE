@@ -23,11 +23,11 @@ export const create_open_conversation = async (req, res, next) => {
 			
 			res.json(existed_conversation);
 		} else {
-			let receiver_user = await findUser(receiver_id);
+			// let receiver_user = await findUser(receiver_id);
 			let convoData = {
-				name: receiver_user.name,
+				name: 'conversation name',
 				isGroup: false,
-				picture: receiver_user.picture,
+				picture: 'conversation picture',
 				users: [sender_id, receiver_id],
 			};
 			const newConvo = await createConversation(convoData);
