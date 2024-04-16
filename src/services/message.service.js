@@ -10,7 +10,6 @@ export const createMessage = async (data) => {
 };
 
 export const populateMessage = async (id) => {
-	
 	let msg = await MessageModel.findById(id)
 		.populate({
 			path: 'sender',
@@ -29,7 +28,7 @@ export const populateMessage = async (id) => {
 		});
 
 	if (!msg) throw createHttpError.BadRequest('Oops...something went wrong.');
-	
+
 	return msg;
 };
 
@@ -41,8 +40,8 @@ export const getConvoMessages = async (convo_id) => {
 		.populate('conversation');
 
 	if (!messages) {
-		throw createHttpError.BadRequest('Oops...something went wrong.');
+		throw createHttpError.BadRequest('Oops...something went wrong. messages not found.');
 	}
-	
+
 	return messages;
 };

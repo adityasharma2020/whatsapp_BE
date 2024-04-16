@@ -11,6 +11,12 @@ const messageSchema = Mongoose.Schema(
 			type: String,
 			trim: true,
 		},
+		messageStatus:{
+			type:String,
+			default: 'sent'
+		}
+		,
+
 		conversation: {
 			type: ObjectId,
 			ref: 'ConversationModel',
