@@ -3,7 +3,6 @@ import { MessageModel } from '../models/index.js';
 
 export const createMessage = async (data) => {
 	let newMessage = await MessageModel.create(data);
-	console.log(newMessage);
 	if (!newMessage) throw createHttpError.BadRequest('Oops...something went wrong.');
 
 	return newMessage;

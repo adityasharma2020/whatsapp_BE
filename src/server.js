@@ -52,7 +52,7 @@ mongoose
 
 let server = app.listen(PORT, () => {
 	logger.info(`server is listening at ${PORT}`);
-	// console.log(process.pid);
+
 	// throw new Error('error in server');
 });
 
@@ -66,7 +66,7 @@ const io = new Server(server, {
 
 io.on('connection', (socket) => {
 	logger.info('socket io connected successfully.');
-	SocketServer(socket);
+	SocketServer(socket, io);
 });
 
 //----------handle server errors----------------------
