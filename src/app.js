@@ -24,7 +24,7 @@ import routes from './routes/index.js';
 dotenv.config();
 
 // CORS Allowed origin
-const allowedOrigins = ['http://localhost:3000', 'https://example.com'];
+const allowedOrigins = ['http://localhost:3000', 'http://192.168.29.24:3000'];
 const corsOptions = {
 	origin: function (origin, callback) {
 		// Check if the origin is in the list of allowed origins
