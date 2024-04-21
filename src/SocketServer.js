@@ -3,6 +3,8 @@
     socket.io allow us to makes rooms, so that whetver we send
     is in that room only.so we make a room when the user connected .
 */
+
+import Message from './models/messageModel.js';
 let onlineUsers = [];
 export default function (socket, io) {
 	//user joins or opens the application
@@ -45,6 +47,25 @@ export default function (socket, io) {
 	});
 	socket.on('stop typing', (conversation) => {
 		socket.in(conversation).emit('stop typing');
+	});
+
+	// seen
+	socket.on('markMessagesAsSeen', async ({ conversationId, userId }) => {
+		try {
+			console.log(":::::::::::::::::::::::::::::::::::::::::::::::::");
+			await Message.updateMany(
+				{
+					conversationId: conversationId,
+					seen: false,
+				},
+				{ $set: { seen: true } }
+			);
+			let user = onlineUsers.find((user) => user.userId == userId);
+
+			io.to(user.socketId).emit('messagesSeen', { conversationId });
+		} catch (error) {
+			console.log(error);
+		}
 	});
 
 	//call

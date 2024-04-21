@@ -11,9 +11,9 @@ const messageSchema = Mongoose.Schema(
 			type: String,
 			trim: true,
 		},
-		messageStatus:{
-			type:String,
-			default: 'sent'
+		seen:{
+			type:Boolean,
+			default: 'false'
 		}
 		,
 
