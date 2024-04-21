@@ -78,7 +78,7 @@ export default function (socket, io) {
 
 	// ------------------------------------------------------
 
->>>>>>> f835f64ed0ddc7310d5f3491bc78c6589e221e2d
+
 	//call
 	socket.on('call user', (data) => {
 		let userId = data.userToCall;
