@@ -14,8 +14,9 @@ export default function (socket, io) {
 		}
 		//send online users to frontend
 		io.emit('get-online-users', onlineUsers);
+
 		//send socket id
-		io.emit('setup socket', socket.id);
+		io.to(socket.id).emit('setup socket', socket.id);
 	});
 
 	//socket disconnect
@@ -47,8 +48,34 @@ export default function (socket, io) {
 		socket.in(conversation).emit('stop typing');
 	});
 
+	// -----piyush call funcitons----
+	socket.on('user:call', ({ to, offer }) => {
+		let toUser = onlineUsers.find((user) => user.userId == to);
+
+		io.to(toUser.socketId).emit('incoming:call', {
+			from: socket.id,
+			offer: offer,
+		});
+	});
+
+	socket.on('call:accepted', ({ to, ans }) => {
+		io.to(to).emit('call:finallyAccepted', { from: socket.id, ans: ans });
+	});
+
+	socket.on('peer:negotiate:needed', ({ to, offer }) => {
+		let toUser = onlineUsers.find((user) => user.userId == to);
+		console.log('negotiateeeee:::::', to, offer);
+		io.to(to).emit('peer:negotiate:neededFinally', { from: socket.id, offer: offer });
+	});
+	
+	socket.on('peer:nego:done', ({ to, ans }) => {
+		console.log('negotiate Donee:::::', to, ans);
+		io.to(to).emit('peer:nego:final', { from: socket.id, ans });
+	});
+
+	// ------------------------------------------------------
+
 	//call
-	//---call user
 	socket.on('call user', (data) => {
 		let userId = data.userToCall;
 		let userSocketId = onlineUsers.find((user) => user.userId == userId);
