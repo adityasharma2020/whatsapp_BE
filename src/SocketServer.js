@@ -4,7 +4,7 @@
     is in that room only.so we make a room when the user connected .
 */
 
-import Message from './models/messageModel.js';
+import { MessageModel } from './models/index.js';
 let onlineUsers = [];
 export default function (socket, io) {
 	//user joins or opens the application
@@ -35,6 +35,7 @@ export default function (socket, io) {
 	//send and receive message
 	socket.on('send message', (message) => {
 		let conversation = message.conversation;
+		
 		if (!conversation.users) return;
 		conversation.users.forEach((user) => {
 			if (user._id === message.sender._id) return;
@@ -50,53 +51,51 @@ export default function (socket, io) {
 		socket.in(conversation).emit('stop typing');
 	});
 
-
-	// -----piyush call funcitons----
-	socket.on('user:call', ({ to, offer }) => {
-		let toUser = onlineUsers.find((user) => user.userId == to);
-
-		io.to(toUser.socketId).emit('incoming:call', {
-			from: socket.id,
-			offer: offer,
-		});
+	socket.on('messages seen', async ({ convo_id, chatUserId }) => {
+		console.log('server::inside messages seen');
+		try {
+			const updatedMessages = await MessageModel.updateMany(
+				{ conversation: convo_id, seen: false, sender: chatUserId },
+				{ $set: { seen: true } }
+			);
+			console.log(updatedMessages);
+			let chatUserSocket = onlineUsers.find((user) => user.userId === chatUserId);
+			socket.to(chatUserSocket.socketId).emit('messages seen', { convo_id });
+		} catch (error) {
+			console.log('error while updating seen messages');
+		}
 	});
+	//----------------------------------
 
-	socket.on('call:accepted', ({ to, ans }) => {
-		io.to(to).emit('call:finallyAccepted', { from: socket.id, ans: ans });
-	});
-
-	socket.on('peer:negotiate:needed', ({ to, offer }) => {
-		let toUser = onlineUsers.find((user) => user.userId == to);
-		console.log('negotiateeeee:::::', to, offer);
-		io.to(to).emit('peer:negotiate:neededFinally', { from: socket.id, offer: offer });
-	});
-	
-	socket.on('peer:nego:done', ({ to, ans }) => {
-		console.log('negotiate Donee:::::', to, ans);
-		io.to(to).emit('peer:nego:final', { from: socket.id, ans });
-	});
-
-	// ------------------------------------------------------
-
-
-	//call
 	socket.on('call user', (data) => {
 		let userId = data.userToCall;
-		let userSocketId = onlineUsers.find((user) => user.userId == userId);
-		io.to(userSocketId.socketId).emit('call user', {
+		let userSocketId = onlineUsers.find((user) => user.userId === userId);
+		io.to(userSocketId.socketId).emit('incoming call', {
 			signal: data.signal,
 			from: data.from,
+			to: userSocketId.socketId,
 			name: data.name,
 			picture: data.picture,
 		});
 	});
+
+	socket.on('not responded', ({ to }) => {
+		console.log('server:not responded', to);
+		socket.to(to).emit('not responded');
+	});
+	socket.on('call rejected', ({ to }) => {
+		socket.to(to).emit('call rejected');
+	});
+
 	//---answer call
-	socket.on('answer call', (data) => {
-		io.to(data.to).emit('call accepted', data.signal);
+	socket.on('answer call', ({ signal, to }) => {
+		console.log('server:::inside answer call');
+		io.to(to).emit('call accepted', signal);
 	});
 
 	//---end call
 	socket.on('end call', (id) => {
+		console.log('server:::inside end call');
 		io.to(id).emit('end call');
 	});
 }
