@@ -24,7 +24,7 @@ import routes from './routes/index.js';
 dotenv.config();
 
 // CORS Allowed origin
-const allowedOrigins = ['https://the-chatapp.netlify.app'];
+const allowedOrigins = ['https://the-chatapp.netlify.app','https://the-chatapp.netlify.app/login'];
 const corsOptions = {
 	origin: function (origin, callback) {
 		// Check if the origin is in the list of allowed origins
@@ -85,6 +85,11 @@ app.get('/test', (req, res) => {
 app.get('/', (req, res) => {
 	res.send(`<div>this is  main page</div>`);
 });
+
+app.get('*', (req, res) => {
+    res.redirect(302, '/');
+});
+
 
 // Default Route Handler : acts as a catch-all for unmatched routes.
 app.use(async (req, res, next) => {
