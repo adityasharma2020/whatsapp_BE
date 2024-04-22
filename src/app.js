@@ -86,9 +86,6 @@ app.get('/', (req, res) => {
 	res.send(`<div>this is  main page</div>`);
 });
 
-app.get('*', (req, res) => {
-    res.redirect(302, '/');
-});
 
 
 // Default Route Handler : acts as a catch-all for unmatched routes.
