@@ -24,7 +24,7 @@ import routes from './routes/index.js';
 dotenv.config();
 
 // CORS Allowed origin
-const allowedOrigins = ['https://thewhatsappweb.netlify.app', ''];
+const allowedOrigins = ['https://the-chatapp.netlify.app', 'https://the-chatapp.netlify.app/*'];
 const corsOptions = {
 	origin: function (origin, callback) {
 		// Check if the origin is in the list of allowed origins
