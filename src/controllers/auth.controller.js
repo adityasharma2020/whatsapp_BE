@@ -18,8 +18,8 @@ import { createUser, signUser } from '../services/auth.service.js';
 import { generateToken, verifyToken } from '../services/token.service.js';
 import { findUser } from '../services/user.service.js';
 
-const accessTokenExpiration = '1d';
-const refreshTokenExpiration = '30d';
+const accessTokenExpiration = '30d';
+const refreshTokenExpiration = '1y';
 
 export const register = async (req, res, next) => {
 	try {
