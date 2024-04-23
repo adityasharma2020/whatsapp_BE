@@ -35,7 +35,7 @@ export default function (socket, io) {
 	//send and receive message
 	socket.on('send message', (message) => {
 		let conversation = message.conversation;
-		
+
 		if (!conversation.users) return;
 		conversation.users.forEach((user) => {
 			if (user._id === message.sender._id) return;
@@ -52,17 +52,17 @@ export default function (socket, io) {
 	});
 
 	socket.on('messages seen', async ({ convo_id, chatUserId }) => {
-		console.log('server::inside messages seen');
+	
 		try {
 			const updatedMessages = await MessageModel.updateMany(
-				{ conversation: convo_id, seen: false, sender: chatUserId },
+				{ conversation: convo_id, seen: false },
 				{ $set: { seen: true } }
 			);
-			console.log(updatedMessages);
+			
 			let chatUserSocket = onlineUsers.find((user) => user.userId === chatUserId);
 			socket.to(chatUserSocket.socketId).emit('messages seen', { convo_id });
 		} catch (error) {
-			console.log('error while updating seen messages');
+		
 		}
 	});
 	//----------------------------------
@@ -80,7 +80,7 @@ export default function (socket, io) {
 	});
 
 	socket.on('not responded', ({ to }) => {
-		console.log('server:not responded', to);
+	
 		socket.to(to).emit('not responded');
 	});
 	socket.on('call rejected', ({ to }) => {
@@ -88,14 +88,14 @@ export default function (socket, io) {
 	});
 
 	//---answer call
-	socket.on('answer call', ({ signal, to }) => {
-		console.log('server:::inside answer call');
-		io.to(to).emit('call accepted', signal);
+	socket.on('answer call', ({ signal, to, from }) => {
+	
+		io.to(to).emit('call accepted', { signal: signal, receiverId: from });
 	});
 
 	//---end call
 	socket.on('end call', (id) => {
-		console.log('server:::inside end call');
-		io.to(id).emit('end call');
+		
+		io.to(id).emit('end call', { to: id });
 	});
 }

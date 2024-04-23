@@ -23,8 +23,8 @@ const refreshTokenExpiration = '1y';
 
 export const register = async (req, res, next) => {
 	try {
-		const { name, email, picture, status, password } = req.body;
-		const newUser = await createUser({ name, email, picture, status, password });
+		const { name, email, picture,mobile, status, password } = req.body;
+		const newUser = await createUser({ name, email,mobile, picture, status, password });
 
 		const access_token = await generateToken(
 			{ userId: newUser._id },
@@ -59,6 +59,7 @@ export const register = async (req, res, next) => {
 				picture: newUser.picture,
 				status: newUser.status,
 				token: access_token,
+				mobile:newUser.mobile
 			},
 		});
 	} catch (error) {
@@ -101,6 +102,7 @@ export const login = async (req, res, next) => {
 				picture: user.picture,
 				status: user.status,
 				token: access_token,
+				mobile:user.mobile
 			},
 		});
 	} catch (error) {
@@ -143,6 +145,7 @@ export const refreshToken = async (req, res, next) => {
 				picture: user.picture,
 				status: user.status,
 				token: access_token,
+				mobile:user.mobile
 			},
 		});
 	} catch (error) {

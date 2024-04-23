@@ -12,6 +12,7 @@ export const searchUsers = async (keyword, userId) => {
 		$or: [
 			{ name: { $regex: keyword, $options: 'i' } },
 			{ email: { $regex: keyword, $options: 'i' } },
+			{ mobile: keyword },
 		],
 	}).find({
 		_id: { $ne: userId },

@@ -7,11 +7,11 @@ import bcrypt from 'bcrypt';
 const { DEFAULT_PICTURE, DEFAULT_STATUS } = process.env;
 
 export const createUser = async (userData) => {
-	const { name, email, picture, status, password } = userData;
+	const { name, email, mobile, picture, status, password } = userData;
 
 	//   ----------------------all validations---------------------------
 	//check if fields are empty
-	if (!name || !email || !password) {
+	if (!name || !email || !mobile || !password) {
 		throw createHttpError.BadRequest('please fill all fields');
 	}
 
@@ -31,13 +31,21 @@ export const createUser = async (userData) => {
 	if (!validator.isEmail(email)) {
 		throw createHttpError.BadRequest('Please make sure to provide a valid email address');
 	}
-
+	
 	//check if user already exits
 	const checkDb = await UserModel.findOne({ email });
 	if (checkDb) {
 		throw createHttpError.Conflict(
 			'please try again with a different email address, this email is already registered'
 		);
+	}
+
+	// Check if the mobile number exists in the database
+	const existingUser = await UserModel.findOne({ mobile });
+
+	// If a user with the given mobile number already exists, throw a Conflict error
+	if (existingUser) {
+		throw createHttpError.Conflict('Mobile number is already registered');
 	}
 
 	//check password length
@@ -56,6 +64,7 @@ export const createUser = async (userData) => {
 		picture: picture || DEFAULT_PICTURE,
 		status: status || DEFAULT_STATUS,
 		password,
+		mobile
 	}).save();
 
 	return user;

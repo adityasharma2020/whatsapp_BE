@@ -102,7 +102,7 @@ app.use(async (err, req, res, next) => {
 	res.send({
 		error: {
 			status: err.status || 500,
-			message: `message::${err.message}`,
+			message: `${err.message}`,
 		},
 	});
 });
